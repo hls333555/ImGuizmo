@@ -120,12 +120,6 @@ namespace ImGuizmo
    // call BeginFrame right after ImGui_XXXX_NewFrame();
    IMGUI_API void BeginFrame();
 
-   // this is necessary because when imguizmo is compiled into a dll, and imgui into another
-   // globals are not shared between them.
-   // More details at https://stackoverflow.com/questions/19373061/what-happens-to-global-and-static-variables-in-a-shared-library-when-it-is-dynam
-   // expose method to set imgui context
-   IMGUI_API void SetImGuiContext(ImGuiContext* ctx);
-
    // return true if mouse cursor is over any gizmo control (axis, plan or screen component)
    IMGUI_API bool IsOver();
 
@@ -177,7 +171,7 @@ namespace ImGuizmo
       WORLD
    };
 
-   IMGUI_API bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix = NULL, const float* snap = NULL, const float* localBounds = NULL, const float* boundsSnap = NULL);
+   IMGUI_API bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix = NULL, float* snap = NULL, float* localBounds = NULL, float* boundsSnap = NULL);
    //
    // Please note that this cubeview is patented by Autodesk : https://patents.google.com/patent/US7782319B2/en
    // It seems to be a defensive patent in the US. I don't think it will bring troubles using it as
