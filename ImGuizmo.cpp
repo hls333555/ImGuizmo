@@ -42,31 +42,34 @@ namespace ImGuizmo
    static const float DEG2RAD = (ZPI / 180.f);
    static float gGizmoSizeClipSpace = 0.1f;
    const float screenRotateSize = 0.06f;
+   static constexpr float lineThickness = 4.5f;
+   static constexpr float scaleCircleSize = lineThickness * 2.0f;
+   static constexpr float translationArrowSize = lineThickness * 2.0f;
 
    static OPERATION operator&(OPERATION lhs, OPERATION rhs)
    {
-     return static_cast<OPERATION>(static_cast<int>(lhs) & static_cast<int>(rhs));
+      return static_cast<OPERATION>(static_cast<int>(lhs) & static_cast<int>(rhs));
    }
 
    static bool operator!=(OPERATION lhs, int rhs)
    {
-     return static_cast<int>(lhs) != rhs;
+      return static_cast<int>(lhs) != rhs;
    }
 
    static bool operator==(OPERATION lhs, int rhs)
    {
-     return static_cast<int>(lhs) == rhs;
+      return static_cast<int>(lhs) == rhs;
    }
 
    static bool Intersects(OPERATION lhs, OPERATION rhs)
    {
-     return (lhs & rhs) != 0;
+      return (lhs & rhs) != 0;
    }
 
    // True if lhs contains rhs
    static bool Contains(OPERATION lhs, OPERATION rhs)
    {
-     return (lhs & rhs) == rhs;
+      return (lhs & rhs) == rhs;
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -618,17 +621,17 @@ namespace ImGuizmo
 
    static bool IsTranslateType(int type)
    {
-     return type >= MT_MOVE_X && type <= MT_MOVE_SCREEN;
+      return type >= MT_MOVE_X && type <= MT_MOVE_SCREEN;
    }
 
    static bool IsRotateType(int type)
    {
-     return type >= MT_ROTATE_X && type <= MT_ROTATE_SCREEN;
+      return type >= MT_ROTATE_X && type <= MT_ROTATE_SCREEN;
    }
 
    static bool IsScaleType(int type)
    {
-     return type >= MT_SCALE_X && type <= MT_SCALE_XYZ;
+      return type >= MT_SCALE_X && type <= MT_SCALE_XYZ;
    }
 
    // Matches MT_MOVE_AB order
@@ -942,19 +945,19 @@ namespace ImGuizmo
 
    bool IsOver(OPERATION op)
    {
-      if(IsUsing())
+      if (IsUsing())
       {
          return true;
       }
-      if(Intersects(op, SCALE) && GetScaleType(op) != MT_NONE)
+      if (Intersects(op, SCALE) && GetScaleType(op) != MT_NONE)
       {
          return true;
       }
-      if(Intersects(op, ROTATE) && GetRotateType(op) != MT_NONE)
+      if (Intersects(op, ROTATE) && GetRotateType(op) != MT_NONE)
       {
          return true;
       }
-      if(Intersects(op, TRANSLATE) && GetMoveType(op, NULL) != MT_NONE)
+      if (Intersects(op, TRANSLATE) && GetMoveType(op, NULL) != MT_NONE)
       {
          return true;
       }
@@ -1002,11 +1005,11 @@ namespace ImGuizmo
       gContext.mCameraUp = viewInverse.v.up;
 
       // projection reverse
-       vec_t near, far;
-       near.Transform(makeVect(0, 0, 1.f, 1.f), gContext.mProjectionMat);
-       far.Transform(makeVect(0, 0, 2.f, 1.f), gContext.mProjectionMat);
+      vec_t near, far;
+      near.Transform(makeVect(0, 0, 1.f, 1.f), gContext.mProjectionMat);
+      far.Transform(makeVect(0, 0, 2.f, 1.f), gContext.mProjectionMat);
 
-       gContext.mReversed = (near.z/near.w) > (far.z / far.w);
+      gContext.mReversed = (near.z / near.w) > (far.z / far.w);
 
       // compute scale from the size of camera right vector projected on screen at the matrix position
       vec_t pointRight = viewInverse.v.right;
@@ -1055,7 +1058,7 @@ namespace ImGuizmo
                colors[i + 1] = (type == (int)(MT_SCALE_X + i)) ? selectionColor : directionColor[i];
             }
             break;
-         // note: this internal function is only called with three possible values for operation
+            // note: this internal function is only called with three possible values for operation
          default:
             break;
          }
@@ -1098,7 +1101,7 @@ namespace ImGuizmo
          float lenDirMinusPlaneY = GetSegmentLengthClipSpace(makeVect(0.f, 0.f, 0.f), -dirPlaneY);
 
          // For readability
-         bool & allowFlip = gContext.mAllowAxisFlip;
+         bool& allowFlip = gContext.mAllowAxisFlip;
          float mulAxis = (allowFlip && lenDir < lenDirMinus&& fabsf(lenDir - lenDirMinus) > FLT_EPSILON) ? -1.f : 1.f;
          float mulAxisX = (allowFlip && lenDirPlaneX < lenDirMinusPlaneX&& fabsf(lenDirPlaneX - lenDirMinusPlaneX) > FLT_EPSILON) ? -1.f : 1.f;
          float mulAxisY = (allowFlip && lenDirPlaneY < lenDirMinusPlaneY&& fabsf(lenDirPlaneY - lenDirMinusPlaneY) > FLT_EPSILON) ? -1.f : 1.f;
@@ -1164,7 +1167,7 @@ namespace ImGuizmo
 
    static void DrawRotationGizmo(OPERATION op, int type)
    {
-      if(!Intersects(op, ROTATE))
+      if (!Intersects(op, ROTATE))
       {
          return;
       }
@@ -1194,11 +1197,11 @@ namespace ImGuizmo
       int circleMul = hasRSC ? 1 : 2;
       for (int axis = 0; axis < 3; axis++)
       {
-         if(!Intersects(op, static_cast<OPERATION>(ROTATE_Z >> axis)))
+         if (!Intersects(op, static_cast<OPERATION>(ROTATE_Z >> axis)))
          {
             continue;
          }
-         ImVec2* circlePos = (ImVec2*) alloca(sizeof(ImVec2) * (circleMul * halfCircleSegmentCount + 1));
+         ImVec2* circlePos = (ImVec2*)alloca(sizeof(ImVec2) * (circleMul * halfCircleSegmentCount + 1));
 
          float angleStart = atan2f(cameraToModelNormalized[(4 - axis) % 3], cameraToModelNormalized[(3 - axis) % 3]) + ZPI * 0.5f;
 
@@ -1216,11 +1219,11 @@ namespace ImGuizmo
             gContext.mRadiusSquareCenter = radiusAxis;
          }
 
-         drawList->AddPolyline(circlePos, circleMul * halfCircleSegmentCount + 1, colors[3 - axis], false, 2);
+         drawList->AddPolyline(circlePos, circleMul * halfCircleSegmentCount + 1, colors[3 - axis], false, lineThickness);
       }
-      if(hasRSC)
+      if (hasRSC)
       {
-         drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), gContext.mRadiusSquareCenter, colors[0], 64, 3.f);
+         drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), gContext.mRadiusSquareCenter, colors[0], 64, lineThickness);
       }
 
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsRotateType(type))
@@ -1263,9 +1266,9 @@ namespace ImGuizmo
    {
       ImDrawList* drawList = gContext.mDrawList;
 
-      if(!Intersects(op, SCALE))
+      if (!Intersects(op, SCALE))
       {
-        return;
+         return;
       }
 
       // colors
@@ -1282,7 +1285,7 @@ namespace ImGuizmo
 
       for (unsigned int i = 0; i < 3; i++)
       {
-         if(!Intersects(op, static_cast<OPERATION>(SCALE_X << i)))
+         if (!Intersects(op, static_cast<OPERATION>(SCALE_X << i)))
          {
             continue;
          }
@@ -1293,7 +1296,7 @@ namespace ImGuizmo
          // draw axis
          if (belowAxisLimit)
          {
-            bool hasTranslateOnAxis = Contains(op, static_cast<OPERATION>(TRANSLATE_X << i)) ;
+            bool hasTranslateOnAxis = Contains(op, static_cast<OPERATION>(TRANSLATE_X << i));
             float markerScale = hasTranslateOnAxis ? 1.4f : 1.0f;
             ImVec2 baseSSpace = worldToPos(dirAxis * 0.1f * gContext.mScreenFactor, gContext.mMVP);
             ImVec2 worldDirSSpaceNoScale = worldToPos(dirAxis * markerScale * gContext.mScreenFactor, gContext.mMVP);
@@ -1301,15 +1304,15 @@ namespace ImGuizmo
 
             if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID))
             {
-               drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, 0xFF404040, 3.f);
-               drawList->AddCircleFilled(worldDirSSpaceNoScale, 6.f, 0xFF404040);
+               drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, 0xFF404040, lineThickness);
+               drawList->AddCircleFilled(worldDirSSpaceNoScale, scaleCircleSize, 0xFF404040);
             }
 
-            if(!hasTranslateOnAxis || gContext.mbUsing)
+            if (!hasTranslateOnAxis || gContext.mbUsing)
             {
-              drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
+               drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], lineThickness);
             }
-            drawList->AddCircleFilled(worldDirSSpace, 6.f, colors[i + 1]);
+            drawList->AddCircleFilled(worldDirSSpace, scaleCircleSize, colors[i + 1]);
 
             if (gContext.mAxisFactor[i] < 0.f)
             {
@@ -1350,7 +1353,7 @@ namespace ImGuizmo
          return;
       }
 
-      if(!Intersects(op, TRANSLATE))
+      if (!Intersects(op, TRANSLATE))
       {
          return;
       }
@@ -1375,14 +1378,14 @@ namespace ImGuizmo
             ImVec2 baseSSpace = worldToPos(dirAxis * 0.1f * gContext.mScreenFactor, gContext.mMVP);
             ImVec2 worldDirSSpace = worldToPos(dirAxis * gContext.mScreenFactor, gContext.mMVP);
 
-            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
+            drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], lineThickness);
 
             // Arrow head begin
             ImVec2 dir(origin - worldDirSSpace);
 
             float d = sqrtf(ImLengthSqr(dir));
             dir /= d; // Normalize
-            dir *= 6.0f;
+            dir *= translationArrowSize;
 
             ImVec2 ortogonalDir(dir.y, -dir.x); // Perpendicular vector
             ImVec2 a(worldDirSSpace + dir);
@@ -1558,15 +1561,15 @@ namespace ImGuizmo
             int type = MT_NONE;
             vec_t gizmoHitProportion;
 
-            if(Intersects(operation, TRANSLATE))
+            if (Intersects(operation, TRANSLATE))
             {
                type = GetMoveType(operation, &gizmoHitProportion);
             }
-            if(Intersects(operation, ROTATE) && type == MT_NONE)
+            if (Intersects(operation, ROTATE) && type == MT_NONE)
             {
                type = GetRotateType(operation);
             }
-            if(Intersects(operation, SCALE) && type == MT_NONE)
+            if (Intersects(operation, SCALE) && type == MT_NONE)
             {
                type = GetScaleType(operation);
             }
@@ -1718,7 +1721,7 @@ namespace ImGuizmo
       // compute
       for (unsigned int i = 0; i < 3 && type == MT_NONE; i++)
       {
-         if(!Intersects(op, static_cast<OPERATION>(SCALE_X << i)))
+         if (!Intersects(op, static_cast<OPERATION>(SCALE_X << i)))
          {
             continue;
          }
@@ -1764,7 +1767,7 @@ namespace ImGuizmo
 
       for (unsigned int i = 0; i < 3 && type == MT_NONE; i++)
       {
-         if(!Intersects(op, static_cast<OPERATION>(ROTATE_X << i)))
+         if (!Intersects(op, static_cast<OPERATION>(ROTATE_X << i)))
          {
             continue;
          }
@@ -1797,9 +1800,9 @@ namespace ImGuizmo
 
    static int GetMoveType(OPERATION op, vec_t* gizmoHitProportion)
    {
-      if(!Intersects(op, TRANSLATE))
+      if (!Intersects(op, TRANSLATE))
       {
-        return MT_NONE;
+         return MT_NONE;
       }
       ImGuiIO& io = ImGui::GetIO();
       int type = MT_NONE;
@@ -1853,9 +1856,9 @@ namespace ImGuizmo
 
    static bool HandleTranslation(float* matrix, float* deltaMatrix, OPERATION op, int& type, const float* snap)
    {
-      if(!Intersects(op, TRANSLATE) || type != MT_NONE)
+      if (!Intersects(op, TRANSLATE) || type != MT_NONE)
       {
-        return false;
+         return false;
       }
       ImGuiIO& io = ImGui::GetIO();
       bool applyRotationLocaly = gContext.mMode == LOCAL || type == MT_MOVE_SCREEN;
@@ -1966,7 +1969,7 @@ namespace ImGuizmo
 
    static bool HandleScale(float* matrix, float* deltaMatrix, OPERATION op, int& type, const float* snap)
    {
-      if(!Intersects(op, SCALE) || type != MT_NONE)
+      if (!Intersects(op, SCALE) || type != MT_NONE)
       {
          return false;
       }
@@ -2079,9 +2082,9 @@ namespace ImGuizmo
 
    static bool HandleRotation(float* matrix, float* deltaMatrix, OPERATION op, int& type, const float* snap)
    {
-      if(!Intersects(op, ROTATE) || type != MT_NONE)
+      if (!Intersects(op, ROTATE) || type != MT_NONE)
       {
-        return false;
+         return false;
       }
       ImGuiIO& io = ImGui::GetIO();
       bool applyRotationLocaly = gContext.mMode == LOCAL;
@@ -2234,7 +2237,7 @@ namespace ImGuizmo
 
    void AllowAxisFlip(bool value)
    {
-     gContext.mAllowAxisFlip = value;
+      gContext.mAllowAxisFlip = value;
    }
 
    bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix, const float* snap, const float* localBounds, const float* boundsSnap)
@@ -2263,8 +2266,8 @@ namespace ImGuizmo
          if (!gContext.mbUsingBounds)
          {
             manipulated = HandleTranslation(matrix, deltaMatrix, operation, type, snap) ||
-                          HandleScale(matrix, deltaMatrix, operation, type, snap) ||
-                          HandleRotation(matrix, deltaMatrix, operation, type, snap);
+               HandleScale(matrix, deltaMatrix, operation, type, snap) ||
+               HandleRotation(matrix, deltaMatrix, operation, type, snap);
          }
       }
 

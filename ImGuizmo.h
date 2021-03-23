@@ -120,6 +120,12 @@ namespace ImGuizmo
    // call BeginFrame right after ImGui_XXXX_NewFrame();
    IMGUI_API void BeginFrame();
 
+   // this is necessary because when imguizmo is compiled into a dll, and imgui into another
+   // globals are not shared between them.
+   // More details at https://stackoverflow.com/questions/19373061/what-happens-to-global-and-static-variables-in-a-shared-library-when-it-is-dynam
+   // expose method to set imgui context
+   IMGUI_API void SetImGuiContext(ImGuiContext* ctx);
+
    // return true if mouse cursor is over any gizmo control (axis, plan or screen component)
    IMGUI_API bool IsOver();
 
@@ -159,17 +165,17 @@ namespace ImGuizmo
    // translation is applied in world space
    enum OPERATION
    {
-      TRANSLATE_X      = (1u << 0),
-      TRANSLATE_Y      = (1u << 1),
-      TRANSLATE_Z      = (1u << 2),
-      ROTATE_X         = (1u << 3),
-      ROTATE_Y         = (1u << 4),
-      ROTATE_Z         = (1u << 5),
-      ROTATE_SCREEN    = (1u << 6),
-      SCALE_X          = (1u << 7),
-      SCALE_Y          = (1u << 8),
-      SCALE_Z          = (1u << 9),
-      BOUNDS           = (1u << 10),
+      TRANSLATE_X = (1u << 0),
+      TRANSLATE_Y = (1u << 1),
+      TRANSLATE_Z = (1u << 2),
+      ROTATE_X = (1u << 3),
+      ROTATE_Y = (1u << 4),
+      ROTATE_Z = (1u << 5),
+      ROTATE_SCREEN = (1u << 6),
+      SCALE_X = (1u << 7),
+      SCALE_Y = (1u << 8),
+      SCALE_Z = (1u << 9),
+      BOUNDS = (1u << 10),
       TRANSLATE = TRANSLATE_X | TRANSLATE_Y | TRANSLATE_Z,
       ROTATE = ROTATE_X | ROTATE_Y | ROTATE_Z | ROTATE_SCREEN,
       SCALE = SCALE_X | SCALE_Y | SCALE_Z
@@ -177,7 +183,7 @@ namespace ImGuizmo
 
    inline OPERATION operator|(OPERATION lhs, OPERATION rhs)
    {
-     return static_cast<OPERATION>(static_cast<int>(lhs) | static_cast<int>(rhs));
+      return static_cast<OPERATION>(static_cast<int>(lhs) | static_cast<int>(rhs));
    }
 
    enum MODE
@@ -186,7 +192,7 @@ namespace ImGuizmo
       WORLD
    };
 
-   IMGUI_API bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix = NULL, float* snap = NULL, float* localBounds = NULL, float* boundsSnap = NULL);
+   IMGUI_API bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix = NULL, const float* snap = NULL, const float* localBounds = NULL, const float* boundsSnap = NULL);
    //
    // Please note that this cubeview is patented by Autodesk : https://patents.google.com/patent/US7782319B2/en
    // It seems to be a defensive patent in the US. I don't think it will bring troubles using it as
